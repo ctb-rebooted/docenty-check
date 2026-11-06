@@ -168,8 +168,6 @@ a{color:inherit} input,button{font:inherit;letter-spacing:inherit}
 .serp-r.bad strong{color:var(--grey-400)}
 .serp-r.hit{background:var(--grey-100)}
 .cursor{position:absolute;left:0;top:0;width:26px;height:26px;opacity:0;z-index:3;pointer-events:none;filter:drop-shadow(0 2px 3px rgb(10 12 18 / .4));will-change:transform}
-.scene-cta{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:4;opacity:0;pointer-events:none;transition:opacity .3s;box-shadow:var(--shadow)}
-.scene-cta.on{opacity:1;pointer-events:auto}
 
 /* 3. 95% */
 .locks{background:var(--bg-weak);padding-block:clamp(80px,11vw,160px)}
@@ -356,7 +354,6 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
   .knob{width:42px;height:42px;margin-left:-21px}
   .shade{padding-top:150px}
   .warn-btns span{font-size:13.5px;padding:9px 13px}
-  .scene-cta{width:calc(100% - 40px);bottom:18px;font-size:17px;padding:17px 16px}
   .mock-tiles{gap:8px}
   .ages button{font-size:17px;padding:10px 16px;min-height:56px}
   .picker .omni{padding-left:14px}
@@ -453,7 +450,6 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
           <svg class="cursor" id="cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.5 20 13l-7.2 1.3L9 21 4 2.5Z" fill="#FFFFFF" stroke="#161921" stroke-width="1.6" stroke-linejoin="round"/></svg>
         </div>
       </div>
-      <a class="btn btn-lg scene-cta js-focus" id="sceneCta" href="#diagForm">우리 회사도 확인해 보기</a>
     </div>
   </div>
 </section>
@@ -873,7 +869,7 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
   })();
 
   /* 장면 1: 멀쩡한 사이트 → 경고창 → 뒤로 이동 → 다음 회사 */
-  var caps=[].slice.call(document.querySelectorAll("#caps h2")), win=$("win"), shade=$("shade"), warn=$("warn"), serp=$("serp"), cur=$("cursor"), back=$("backBtn"), body=$("bBody"), hit=$("serpHit"), sceneCta=$("sceneCta");
+  var caps=[].slice.call(document.querySelectorAll("#caps h2")), win=$("win"), shade=$("shade"), warn=$("warn"), serp=$("serp"), cur=$("cursor"), back=$("backBtn"), body=$("bBody"), hit=$("serpHit");
   function posIn(el){var a=el.getBoundingClientRect(),b=body.getBoundingClientRect();return {x:a.left-b.left+a.width/2,y:a.top-b.top+a.height/2};}
   /* 히어로 비교 슬라이더. 밀어 볼 수 있고, 스크롤하면 고객 화면으로 닫히며 연출로 이어진다 */
   var capsBox=$("caps"), stick=win.closest(".stick"), split=$("split"), knob=$("knob"), eyes=[$("eyeUs"),$("eyeThem")];
@@ -920,7 +916,6 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
     cur.style.opacity=(p>.44)?1:0;
     cur.style.transform="translate("+(x-4)+"px,"+(y-3)+"px)";
     hit.classList.toggle("hit",p>.88);
-    sceneCta.classList.toggle("on",p>.9);
   }
   /* 장면 2: 알림이 쌓인다. 최신 알림이 맨 위 */
   var notis=[].slice.call(document.querySelectorAll("#notis .noti")).reverse(), cons=[].slice.call(document.querySelectorAll("#cons li"));
@@ -941,7 +936,6 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
     caps.forEach(function(c,i){c.classList.toggle("on",i===1);});
     measure(); stick.style.setProperty("--off","0px"); curP=0; paintX();
     serp.style.opacity=0; cur.style.opacity=0;
-    sceneCta.classList.add("on");
     scene2(1);
     cons.forEach(function(c){c.classList.add("on");});
   }else{
@@ -964,13 +958,13 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
   if("IntersectionObserver" in window){
     var ro=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add("in");ro.unobserve(x.target);}});},{threshold:.1});
     document.querySelectorAll(".rv").forEach(function(el){ro.observe(el);});
-    /* 하단 주소창은 자체 CTA가 없는 화면에서만 나온다 */
+    /* 히어로 입력창이 사라지면 계속 띄운다. 입력창이 이미 있는 PHP 패널과 신청 화면에서만 숨긴다 */
     var dock=$("dock"), own=new Set();
     var io=new IntersectionObserver(function(es){
       es.forEach(function(x){if(x.isIntersecting){own.add(x.target);}else{own.delete(x.target);}});
       dock.classList.toggle("show",own.size===0);
     });
-    ["#diagForm","#why",".locks",".picker","#calls",".free .btn-inv","#apply"].forEach(function(s){io.observe(document.querySelector(s));});
+    ["#diagForm",".verdict-cta","#apply"].forEach(function(s){io.observe(document.querySelector(s));});
   }else{
     document.querySelectorAll(".rv").forEach(function(el){el.classList.add("in");});
   }
