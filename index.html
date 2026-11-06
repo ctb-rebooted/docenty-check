@@ -272,13 +272,13 @@ details.qa{border-bottom:1px solid var(--line)}
 .fg input{width:100%;height:54px;border:0;border-radius:13px;background:var(--grey-100);padding:0 16px;font-size:17px;color:var(--grey-900);transition:box-shadow .15s,background .15s}
 .fg input:focus{outline:0;background:var(--white);box-shadow:inset 0 0 0 2px var(--blue-500)}
 .fg input::placeholder{color:var(--grey-500)}
-.agree{font-size:var(--small);line-height:1.45;margin:14px 0;color:var(--grey-600)}
-.agree label{display:flex;gap:9px;align-items:flex-start;font-weight:600;color:var(--grey-900);cursor:pointer}
-.agree input{width:19px;height:19px;margin:0;accent-color:var(--blue-500);flex:none}
-.agree summary{cursor:pointer;margin:5px 0 0 28px;font-size:13.5px;text-decoration:underline;text-underline-offset:3px}
-.agree table{border-collapse:collapse;margin:8px 0 0;font-size:13.5px;line-height:1.5}
-.agree th{text-align:left;padding:3px 12px 3px 0;white-space:nowrap;vertical-align:top;color:var(--grey-900)}
-.agree td{padding:3px 0}
+.agree{display:flex;gap:9px;align-items:flex-start;font-size:var(--small);line-height:1.45;margin:14px 0;font-weight:600;color:var(--grey-900)}
+.agree input{width:19px;height:19px;margin:0;accent-color:var(--blue-500);flex:none;cursor:pointer}
+.agree label{cursor:pointer}
+.terms-link{border:0;background:none;padding:0;color:inherit;font-weight:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.terms{border-collapse:collapse;width:100%;font-size:var(--small);line-height:1.5;margin-bottom:22px}
+.terms th{text-align:left;padding:11px 16px 11px 0;white-space:nowrap;vertical-align:top;font-weight:600;color:var(--grey-900);border-top:1px solid var(--grey-200)}
+.terms td{padding:11px 0;color:var(--grey-600);border-top:1px solid var(--grey-200)}
 .err{display:none;color:var(--red-500);font-weight:600;font-size:var(--small);margin:0 0 10px}
 .card .btn{width:100%;overflow:hidden;text-overflow:ellipsis}
 .fine{text-align:center;font-size:14px;color:var(--grey-600);margin-top:11px}
@@ -650,17 +650,8 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
         <div class="fg"><label for="coPhone">연락받을 번호</label><input id="coPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" maxlength="20" required></div>
         <div class="fg"><label for="coEmail">리포트 받을 이메일</label><input id="coEmail" type="email" autocomplete="email" placeholder="name@company.com" required></div>
         <div class="agree">
-          <label for="coAgree"><input id="coAgree" type="checkbox" required><span>(필수) 개인정보 수집·이용에 동의합니다</span></label>
-          <details>
-            <summary>내용 보기</summary>
-            <table>
-              <tr><th>수집 목적</th><td>무료 진단 리포트·데모·견적 제공 및 신청 관련 연락</td></tr>
-              <tr><th>수집 항목</th><td>회사명, 홈페이지 주소, 전화번호, 이메일</td></tr>
-              <tr><th>보유 기간</th><td>신청일로부터 1년(동의 철회 요청 시 지체 없이 파기)</td></tr>
-              <tr><th>동의 거부</th><td>동의를 거부할 수 있으며, 거부 시 무료 진단 신청이 제한됩니다.</td></tr>
-            </table>
-            <p style="margin-top:6px">문의·철회: contact@docenty.ai</p>
-          </details>
+          <input id="coAgree" type="checkbox" required>
+          <span><label for="coAgree">(필수) </label><button class="terms-link" type="button" id="termsOpen">개인정보 수집·이용</button><label for="coAgree">에 동의합니다</label></span>
         </div>
         <p class="err" id="applyErr" role="alert"></p>
         <button class="btn btn-lg" type="submit" id="applyBtn">무료로 리포트·시안·견적서 받기</button>
@@ -701,6 +692,23 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
 </div>
 
 <dialog id="diagModal" aria-labelledby="dTitle"><div id="diagPanel"></div></dialog>
+
+<dialog id="termsModal" aria-labelledby="termsTitle">
+  <div class="r-head">
+    <h3 id="termsTitle">개인정보 수집·이용 안내</h3>
+    <button class="r-x" type="button" id="termsClose" aria-label="닫기">✕</button>
+  </div>
+  <div class="r-body">
+    <table class="terms">
+      <tr><th>수집 목적</th><td>무료 진단 리포트·데모·견적 제공 및 신청 관련 연락</td></tr>
+      <tr><th>수집 항목</th><td>회사명, 홈페이지 주소, 전화번호, 이메일</td></tr>
+      <tr><th>보유 기간</th><td>신청일로부터 1년(동의 철회 요청 시 지체 없이 파기)</td></tr>
+      <tr><th>동의 거부</th><td>동의를 거부할 수 있으며, 거부 시 무료 진단 신청이 제한됩니다.</td></tr>
+      <tr><th>문의·철회</th><td>contact@docenty.ai</td></tr>
+    </table>
+    <button class="btn btn-lg" type="button" id="termsAgree">동의하고 닫기</button>
+  </div>
+</dialog>
 
 <script>
 (function(){
@@ -762,6 +770,15 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
     }
   });
   modal.addEventListener("click",function(e){if(e.target===modal)modal.close();});
+
+  /* 개인정보 안내 모달: 폼 높이가 바뀌지 않도록 펼침 대신 모달로 보여 준다 */
+  (function(){
+    var m=$("termsModal"), box=$("coAgree");
+    $("termsOpen").addEventListener("click",function(){m.showModal();});
+    $("termsClose").addEventListener("click",function(){m.close();});
+    $("termsAgree").addEventListener("click",function(){box.checked=true;box.dispatchEvent(new Event("change",{bubbles:true}));m.close();box.focus();});
+    m.addEventListener("click",function(e){if(e.target===m)m.close();});
+  })();
 
   /* 결과 화면 미리 보기: 서버를 부르지 않는 표시용 예시 */
   $("sampleBtn").addEventListener("click",function(){
@@ -834,6 +851,10 @@ dialog::backdrop{background:rgb(10 12 18 / .6)}
   $("coUrl").addEventListener("input",personalizeApply);
   personalizeApply();
   function fail(m,el){err.textContent=m;err.style.display="block";abtn.disabled=false;abtn.textContent=ABTN;if(el)el.focus();}
+  /* 사용자가 입력을 고치는 순간 오류 문구를 지운다. 신청할 때 다시 검사한다 */
+  function clearErr(){err.textContent="";err.style.display="none";}
+  af.addEventListener("input",clearErr);
+  af.addEventListener("change",clearErr);
   af.addEventListener("submit",function(e){
     e.preventDefault();
     err.style.display="none";
